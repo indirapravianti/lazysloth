@@ -29,7 +29,7 @@ export function DateCustomizer({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-quirky-purple flex items-center justify-center border-2 border-foreground">
@@ -44,7 +44,7 @@ export function DateCustomizer({
       </div>
 
       {settings.enabled && (
-        <div className="grid gap-4 pl-11">
+        <div className="grid gap-5 pl-11">
           {/* Date Format */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Date Format</label>
@@ -125,8 +125,8 @@ export function DateCustomizer({
             <label className="text-sm font-medium flex items-center gap-2">
               <Move className="w-4 h-4" /> Position
             </label>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <span className="text-xs text-muted-foreground">X: {Math.round(settings.x)}</span>
                 <Slider
                   value={[settings.x]}
@@ -136,7 +136,7 @@ export function DateCustomizer({
                   step={1}
                 />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <span className="text-xs text-muted-foreground">Y: {Math.round(settings.y)}</span>
                 <Slider
                   value={[settings.y]}

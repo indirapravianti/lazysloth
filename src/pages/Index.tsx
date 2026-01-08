@@ -132,7 +132,7 @@ const Index = () => {
             </TabsList>
 
             <ScrollArea className="flex-1">
-              <div className="p-5">
+              <div className="p-6">
                 <TabsContent value="template" className="mt-0">
                   <TemplateUploader
                     templateImage={config.templateImage}
@@ -147,7 +147,7 @@ const Index = () => {
                   />
                 </TabsContent>
 
-                <TabsContent value="text" className="mt-0 space-y-4">
+                <TabsContent value="text" className="mt-0 space-y-5">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-quirky-yellow flex items-center justify-center border-2 border-foreground">
                       <Type className="w-4 h-4" />
@@ -164,7 +164,7 @@ const Index = () => {
                   />
                 </TabsContent>
 
-                <TabsContent value="extras" className="mt-0 space-y-6">
+                <TabsContent value="extras" className="mt-0 space-y-8">
                   <DateCustomizer
                     settings={config.dateSettings}
                     onSettingsChange={(settings) => updateConfig('dateSettings', settings)}
@@ -172,7 +172,7 @@ const Index = () => {
                     canvasHeight={canvasSize.height}
                   />
                   
-                  <div className="border-t border-border/50 pt-6">
+                  <div className="border-t border-border pt-8">
                     <QRCustomizer
                       settings={config.qrSettings}
                       onSettingsChange={(settings) => updateConfig('qrSettings', settings)}
