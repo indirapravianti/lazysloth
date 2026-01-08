@@ -2,17 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import { Eye } from 'lucide-react';
 import type { CertificateConfig } from '@/types/certificate';
 import { formatDate, generateQRCode } from '@/lib/certificate-utils';
-
 interface CertificatePreviewProps {
   config: CertificateConfig;
   previewName: string;
   onCanvasLoad: (width: number, height: number) => void;
 }
-
-export function CertificatePreview({ config, previewName, onCanvasLoad }: CertificatePreviewProps) {
+export function CertificatePreview({
+  config,
+  previewName,
+  onCanvasLoad
+}: CertificatePreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-
   useEffect(() => {
     const generateQR = async () => {
       if (config.qrSettings.enabled) {
@@ -22,13 +23,10 @@ export function CertificatePreview({ config, previewName, onCanvasLoad }: Certif
     };
     generateQR();
   }, [config.qrSettings.enabled, config.qrSettings.size, previewName]);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
-
     if (!canvas || !ctx || !config.templateImage) return;
-
     const img = new Image();
     img.onload = () => {
       canvas.width = img.width;
@@ -57,40 +55,17 @@ export function CertificatePreview({ config, previewName, onCanvasLoad }: Certif
       if (config.qrSettings.enabled && qrCodeUrl) {
         const qrImg = new Image();
         qrImg.onload = () => {
-          ctx.drawImage(
-            qrImg,
-            config.qrSettings.x - config.qrSettings.size / 2,
-            config.qrSettings.y - config.qrSettings.size / 2,
-            config.qrSettings.size,
-            config.qrSettings.size
-          );
+          ctx.drawImage(qrImg, config.qrSettings.x - config.qrSettings.size / 2, config.qrSettings.y - config.qrSettings.size / 2, config.qrSettings.size, config.qrSettings.size);
         };
         qrImg.src = qrCodeUrl;
       }
     };
     img.src = config.templateImage;
   }, [config, previewName, qrCodeUrl, onCanvasLoad]);
-
   if (!config.templateImage) {
-    return (
-      <div className="quirky-card p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-lg bg-quirky-yellow flex items-center justify-center border-2 border-foreground">
-            <Eye className="w-5 h-5 text-accent-foreground" />
-          </div>
-          <h3 className="text-lg font-bold">Live Preview</h3>
-        </div>
-        <div className="aspect-[16/11] bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-foreground">
-          <p className="text-muted-foreground text-center px-4">
-            Upload a template to see the preview ✨
-          </p>
-        </div>
-      </div>
-    );
+    return;
   }
-
-  return (
-    <div className="quirky-card p-6">
+  return <div className="quirky-card p-6">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-lg bg-quirky-yellow flex items-center justify-center border-2 border-foreground">
           <Eye className="w-5 h-5 text-accent-foreground" />
@@ -98,11 +73,7 @@ export function CertificatePreview({ config, previewName, onCanvasLoad }: Certif
         <h3 className="text-lg font-bold">Live Preview</h3>
       </div>
       <div className="overflow-hidden rounded-lg border-2 border-foreground bg-card">
-        <canvas
-          ref={canvasRef}
-          className="w-full h-auto"
-        />
+        <canvas ref={canvasRef} className="w-full h-auto" />
       </div>
-    </div>
-  );
+    </div>;
 }
