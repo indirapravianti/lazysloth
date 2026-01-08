@@ -48,74 +48,74 @@ export function GenerateSection({ config }: GenerateSectionProps) {
   };
 
   return (
-    <div className="quirky-card p-6 bg-gradient-to-br from-quirky-pink/10 via-quirky-yellow/10 to-quirky-teal/10">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-quirky-pink to-quirky-purple flex items-center justify-center border-2 border-foreground animate-float">
-          <Sparkles className="w-5 h-5 text-primary-foreground" />
+    <div className="space-y-5">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-quirky-pink to-quirky-purple flex items-center justify-center border-2 border-foreground">
+          <Sparkles className="w-4 h-4 text-primary-foreground" />
         </div>
         <div>
-          <h3 className="text-lg font-bold">Generate Certificates</h3>
-          <p className="text-sm text-muted-foreground">
-            {config.names.length} certificate{config.names.length !== 1 ? 's' : ''} ready to generate
+          <h3 className="text-sm font-bold">Generate Certificates</h3>
+          <p className="text-xs text-muted-foreground">
+            {config.names.length} certificate{config.names.length !== 1 ? 's' : ''} ready
           </p>
         </div>
       </div>
 
       {!canGenerate && (
-        <div className="bg-muted rounded-lg p-4 mb-4 border-2 border-dashed border-foreground">
-          <p className="text-sm text-muted-foreground text-center">
+        <div className="bg-muted/50 rounded-lg p-4 border border-dashed border-border">
+          <p className="text-xs text-muted-foreground text-center">
             {!config.templateImage
-              ? '📸 Upload a certificate template first!'
-              : '📝 Add some names to generate certificates for!'}
+              ? '📸 Upload a template first'
+              : '📝 Add some names'}
           </p>
         </div>
       )}
 
       {isGenerating && (
-        <div className="space-y-3 mb-4">
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+            <Loader2 className="w-4 h-4 animate-spin text-primary" />
             <span className="text-sm font-medium">
               Generating... {Math.round(progress)}%
             </span>
           </div>
-          <Progress value={progress} className="h-3" />
+          <Progress value={progress} className="h-2" />
         </div>
       )}
 
       {error && (
-        <div className="bg-destructive/10 text-destructive rounded-lg p-4 mb-4 border-2 border-destructive">
-          <p className="text-sm">{error}</p>
+        <div className="bg-destructive/10 text-destructive rounded-lg p-3 border border-destructive">
+          <p className="text-xs">{error}</p>
         </div>
       )}
 
       {generatedCerts.length > 0 && !isGenerating && (
-        <div className="bg-secondary/20 rounded-lg p-4 mb-4 border-2 border-secondary">
+        <div className="bg-secondary/10 rounded-lg p-3 border border-secondary">
           <div className="flex items-center gap-2 text-secondary">
-            <CheckCircle className="w-5 h-5" />
-            <span className="font-medium">
-              {generatedCerts.length} certificate{generatedCerts.length !== 1 ? 's' : ''} generated! 🎉
+            <CheckCircle className="w-4 h-4" />
+            <span className="text-sm font-medium">
+              {generatedCerts.length} certificate{generatedCerts.length !== 1 ? 's' : ''} ready! 🎉
             </span>
           </div>
         </div>
       )}
 
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-2">
         <QuirkyButton
           variant="quirkyPink"
-          size="lg"
+          size="default"
           onClick={handleGenerate}
           disabled={!canGenerate || isGenerating}
-          className="flex-1"
+          className="w-full"
         >
           {isGenerating ? (
             <>
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" />
               Generating...
             </>
           ) : (
             <>
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-4 h-4" />
               Generate All
             </>
           )}
@@ -124,11 +124,11 @@ export function GenerateSection({ config }: GenerateSectionProps) {
         {generatedCerts.length > 0 && (
           <QuirkyButton
             variant="quirkyTeal"
-            size="lg"
+            size="default"
             onClick={handleDownload}
-            className="flex-1"
+            className="w-full"
           >
-            <Download className="w-5 h-5" />
+            <Download className="w-4 h-4" />
             Download {generatedCerts.length > 1 ? 'ZIP' : 'PNG'}
           </QuirkyButton>
         )}

@@ -41,18 +41,18 @@ export function TemplateUploader({ templateImage, onTemplateChange }: TemplateUp
   };
 
   return (
-    <div className="quirky-card p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-lg bg-quirky-pink flex items-center justify-center border-2 border-foreground">
-          <Image className="w-5 h-5 text-primary-foreground" />
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-lg bg-quirky-pink flex items-center justify-center border-2 border-foreground">
+          <Image className="w-4 h-4 text-primary-foreground" />
         </div>
-        <h3 className="text-lg font-bold">Certificate Template</h3>
+        <h3 className="text-sm font-bold">Certificate Template</h3>
       </div>
       
       <div
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        className="border-2 border-dashed border-foreground rounded-lg p-8 text-center transition-colors hover:bg-muted cursor-pointer"
+        className="border-2 border-dashed border-foreground/50 rounded-lg p-6 text-center transition-colors hover:bg-muted cursor-pointer"
       >
         <input
           type="file"
@@ -67,16 +67,16 @@ export function TemplateUploader({ templateImage, onTemplateChange }: TemplateUp
               <img
                 src={templateImage}
                 alt="Certificate template"
-                className="max-h-48 mx-auto rounded-lg border-2 border-foreground"
+                className="max-h-40 mx-auto rounded-lg border-2 border-foreground"
               />
-              <p className="text-sm text-muted-foreground">Click or drag to replace</p>
+              <p className="text-xs text-muted-foreground">Click or drag to replace</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              <Upload className="w-12 h-12 mx-auto text-muted-foreground" />
+            <div className="space-y-2">
+              <Upload className="w-10 h-10 mx-auto text-muted-foreground" />
               <div>
-                <p className="font-semibold">Drop your template here</p>
-                <p className="text-sm text-muted-foreground">or click to browse</p>
+                <p className="text-sm font-medium">Drop your template here</p>
+                <p className="text-xs text-muted-foreground">or click to browse</p>
               </div>
             </div>
           )}

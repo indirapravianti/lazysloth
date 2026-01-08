@@ -58,8 +58,8 @@ export function NamesUploader({ names, onNamesChange }: NamesUploaderProps) {
   };
 
   return (
-    <div className="quirky-card p-4">
-      <div className="flex items-center gap-3 mb-4">
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg bg-quirky-teal flex items-center justify-center border-2 border-foreground">
           <Users className="w-4 h-4 text-secondary-foreground" />
         </div>
@@ -71,56 +71,54 @@ export function NamesUploader({ names, onNamesChange }: NamesUploaderProps) {
         )}
       </div>
 
-      <div className="space-y-3">
-        <div className="flex gap-2">
-          <input
-            type="file"
-            accept=".txt,.csv"
-            onChange={handleFileChange}
-            className="hidden"
-            id="names-upload"
-          />
-          <label htmlFor="names-upload">
-            <QuirkyButton variant="outline" size="sm" asChild>
-              <span>
-                <FileText className="w-4 h-4" />
-                Upload
-              </span>
-            </QuirkyButton>
-          </label>
-          {names.length > 0 && (
-            <QuirkyButton variant="ghost" size="sm" onClick={clearAll}>
-              Clear
-            </QuirkyButton>
-          )}
-        </div>
-
-        <textarea
-          placeholder="Type names here (one per line)"
-          className="quirky-input w-full h-32 resize-none text-sm"
-          value={rawText}
-          onChange={handleTextChange}
+      <div className="flex gap-2">
+        <input
+          type="file"
+          accept=".txt,.csv"
+          onChange={handleFileChange}
+          className="hidden"
+          id="names-upload"
         />
-
+        <label htmlFor="names-upload">
+          <QuirkyButton variant="outline" size="sm" asChild>
+            <span>
+              <FileText className="w-4 h-4" />
+              Upload
+            </span>
+          </QuirkyButton>
+        </label>
         {names.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-muted rounded-lg">
-            {names.map((name, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center gap-1 bg-card px-2 py-0.5 rounded-full border-2 border-foreground text-xs font-medium"
-              >
-                {name}
-                <button
-                  onClick={() => removeName(index)}
-                  className="hover:text-destructive transition-colors"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </span>
-            ))}
-          </div>
+          <QuirkyButton variant="ghost" size="sm" onClick={clearAll}>
+            Clear
+          </QuirkyButton>
         )}
       </div>
+
+      <textarea
+        placeholder="Type names here (one per line)"
+        className="quirky-input w-full h-28 resize-none text-sm"
+        value={rawText}
+        onChange={handleTextChange}
+      />
+
+      {names.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 max-h-20 overflow-y-auto p-2 bg-muted/50 rounded-lg">
+          {names.map((name, index) => (
+            <span
+              key={index}
+              className="inline-flex items-center gap-1 bg-card px-2 py-0.5 rounded-full border border-border text-xs font-medium"
+            >
+              {name}
+              <button
+                onClick={() => removeName(index)}
+                className="hover:text-destructive transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
