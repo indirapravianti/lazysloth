@@ -1,84 +1,41 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Award, ImageIcon, Type, QrCode, Download, ZoomIn, ZoomOut, ArrowLeft, Plus, Calendar } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { ImageIcon, Layers, Database, Eye, ZoomIn, ZoomOut, ArrowLeft, Download } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { useTemplates } from '@/hooks/useTemplates';
 import { TemplateUploader } from '@/components/TemplateUploader';
-import { TextCustomizer } from '@/components/TextCustomizer';
-import { DateCustomizer } from '@/components/DateCustomizer';
-import { QRCustomizer } from '@/components/QRCustomizer';
-import { CertificatePreview } from '@/components/CertificatePreview';
-import type { CertificateConfig, TextSettings, DateSettings, QRSettings } from '@/types/certificate';
+import { FieldsPanel } from '@/components/editor/FieldsPanel';
+import { DataEntryPanel } from '@/components/editor/DataEntryPanel';
+import { PreviewPanel } from '@/components/editor/PreviewPanel';
+import { CanvasEditor } from '@/components/editor/CanvasEditor';
+import type { TemplateField, FieldType } from '@/types/template';
+import { DEFAULT_FIELD_STYLES } from '@/types/template';
 
-// Convert new template structure to legacy config for preview
-function templateToConfig(
-  backgroundImage: string | null,
-  nameSettings: TextSettings,
-  dateSettings: DateSettings,
-  qrSettings: QRSettings,
-  names: string[]
-): CertificateConfig {
-  return {
-    templateImage: backgroundImage,
-    names,
-    nameSettings,
-    dateSettings,
-    qrSettings,
-  };
+interface DataEntry {
+  [fieldId: string]: string;
 }
 
 export default function TemplateEditor() {
   const { templateId } = useParams();
-  const navigate = useNavigate();
   const { getTemplate, updateTemplate, isLoading } = useTemplates();
   
   const template = getTemplate(templateId || '');
   
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
-  const [nameSettings, setNameSettings] = useState<TextSettings>({
-    color: '#1a1a1a',
-    fontFamily: 'Georgia, serif',
-    fontSize: 48,
-    x: 400,
-    y: 280,
-  });
-  const [dateSettings, setDateSettings] = useState<DateSettings>({
-    enabled: true,
-    format: 'full',
-    color: '#4a4a4a',
-    fontFamily: 'Georgia, serif',
-    fontSize: 18,
-    x: 400,
-    y: 450,
-  });
-  const [qrSettings, setQrSettings] = useState<QRSettings>({
-    enabled: false,
-    size: 80,
-    x: 700,
-    y: 480,
-  });
-  
+  const [fields, setFields] = useState<TemplateField[]>([]);
+  const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
-  const [zoom, setZoom] = useState(100);
+  const [zoom, setZoom] = useState(50);
+  const [entries, setEntries] = useState<DataEntry[]>([]);
+  const [activeTab, setActiveTab] = useState('template');
 
   // Load template data
   useEffect(() => {
     if (template) {
       setBackgroundImage(template.backgroundImage);
-      // Initialize positions from template canvas
-      const nameField = template.fields.find((f) => f.id === 'name');
-      if (nameField) {
-        setNameSettings({
-          color: nameField.style.color || '#1a1a1a',
-          fontFamily: nameField.style.fontFamily || 'Georgia, serif',
-          fontSize: nameField.style.fontSize || 48,
-          x: nameField.position.x,
-          y: nameField.position.y,
-        });
-      }
+      setFields(template.fields);
     }
   }, [template]);
 
@@ -89,37 +46,53 @@ export default function TemplateEditor() {
     const timeout = setTimeout(() => {
       updateTemplate(template.id, {
         backgroundImage,
-        fields: template.fields.map((field) => {
-          if (field.id === 'name') {
-            return {
-              ...field,
-              position: { x: nameSettings.x, y: nameSettings.y },
-              style: {
-                ...field.style,
-                color: nameSettings.color,
-                fontFamily: nameSettings.fontFamily,
-                fontSize: nameSettings.fontSize,
-              },
-            };
-          }
-          return field;
-        }),
+        fields,
       });
     }, 500);
     
     return () => clearTimeout(timeout);
-  }, [backgroundImage, nameSettings, template, updateTemplate, isLoading]);
+  }, [backgroundImage, fields, template, updateTemplate, isLoading]);
 
   const handleCanvasLoad = useCallback((width: number, height: number) => {
     setCanvasSize({ width, height });
-    if (!backgroundImage) {
-      setNameSettings((prev) => ({ ...prev, x: width / 2, y: height * 0.45 }));
-      setDateSettings((prev) => ({ ...prev, x: width / 2, y: height * 0.75 }));
-      setQrSettings((prev) => ({ ...prev, x: width * 0.85, y: height * 0.85 }));
-    }
-  }, [backgroundImage]);
+  }, []);
 
-  const config = templateToConfig(backgroundImage, nameSettings, dateSettings, qrSettings, []);
+  // Field management
+  const addField = useCallback((type: FieldType) => {
+    const newField: TemplateField = {
+      id: `field_${Date.now()}`,
+      name: type === 'qr' ? 'QR Code' : type === 'date' ? 'Date' : type === 'image' ? 'Photo' : 'New Field',
+      type,
+      required: type !== 'qr',
+      position: {
+        x: canvasSize.width / 2,
+        y: canvasSize.height / 2,
+      },
+      style: { ...DEFAULT_FIELD_STYLES[type] },
+      size: type === 'qr' || type === 'image' ? { width: 100, height: 100 } : undefined,
+    };
+    setFields((prev) => [...prev, newField]);
+    setSelectedFieldId(newField.id);
+  }, [canvasSize]);
+
+  const deleteField = useCallback((id: string) => {
+    setFields((prev) => prev.filter((f) => f.id !== id));
+    if (selectedFieldId === id) setSelectedFieldId(null);
+  }, [selectedFieldId]);
+
+  const updateField = useCallback((id: string, updates: Partial<TemplateField>) => {
+    setFields((prev) =>
+      prev.map((f) => (f.id === id ? { ...f, ...updates } : f))
+    );
+  }, []);
+
+  const updateFieldPosition = useCallback((id: string, x: number, y: number) => {
+    setFields((prev) =>
+      prev.map((f) =>
+        f.id === id ? { ...f, position: { x, y } } : f
+      )
+    );
+  }, []);
 
   if (isLoading) {
     return (
@@ -154,15 +127,19 @@ export default function TemplateEditor() {
               </Link>
               <div>
                 <h1 className="text-lg font-bold tracking-tight">{template.name}</h1>
-                <p className="text-xs text-muted-foreground">Editing template</p>
+                <p className="text-xs text-muted-foreground">
+                  {fields.length} fields • {entries.length} entries ready
+                </p>
               </div>
             </div>
-            <Link to={`/dashboard/generate?template=${template.id}`}>
-              <Button size="sm" className="gap-2">
-                <Download className="w-4 h-4" />
-                Generate Assets
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              {entries.length > 0 && (
+                <Button size="sm" className="gap-2" onClick={() => setActiveTab('preview')}>
+                  <Download className="w-4 h-4" />
+                  Generate {entries.length} Assets
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -171,28 +148,28 @@ export default function TemplateEditor() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar */}
         <aside className="w-80 border-r-2 border-foreground bg-card shrink-0 flex flex-col">
-          <Tabs defaultValue="template" className="flex flex-col h-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
             <TabsList className="grid grid-cols-4 gap-1 p-2 bg-muted/50 rounded-none border-b-2 border-foreground shrink-0">
-              <TabsTrigger value="template" className="flex flex-col items-center gap-1 p-2 data-[state=active]:bg-quirky-pink data-[state=active]:text-accent-foreground rounded-lg">
+              <TabsTrigger value="template" className="flex flex-col items-center gap-1 p-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">
                 <ImageIcon className="w-4 h-4" />
                 <span className="text-[10px] font-medium">Template</span>
               </TabsTrigger>
-              <TabsTrigger value="text" className="flex flex-col items-center gap-1 p-2 data-[state=active]:bg-quirky-yellow data-[state=active]:text-accent-foreground rounded-lg">
-                <Type className="w-4 h-4" />
-                <span className="text-[10px] font-medium">Text</span>
-              </TabsTrigger>
-              <TabsTrigger value="extras" className="flex flex-col items-center gap-1 p-2 data-[state=active]:bg-quirky-purple data-[state=active]:text-primary-foreground rounded-lg">
-                <QrCode className="w-4 h-4" />
-                <span className="text-[10px] font-medium">Extras</span>
-              </TabsTrigger>
-              <TabsTrigger value="fields" className="flex flex-col items-center gap-1 p-2 data-[state=active]:bg-quirky-teal data-[state=active]:text-secondary-foreground rounded-lg">
-                <Plus className="w-4 h-4" />
+              <TabsTrigger value="fields" className="flex flex-col items-center gap-1 p-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">
+                <Layers className="w-4 h-4" />
                 <span className="text-[10px] font-medium">Fields</span>
+              </TabsTrigger>
+              <TabsTrigger value="data" className="flex flex-col items-center gap-1 p-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">
+                <Database className="w-4 h-4" />
+                <span className="text-[10px] font-medium">Data</span>
+              </TabsTrigger>
+              <TabsTrigger value="preview" className="flex flex-col items-center gap-1 p-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">
+                <Eye className="w-4 h-4" />
+                <span className="text-[10px] font-medium">Preview</span>
               </TabsTrigger>
             </TabsList>
 
             <ScrollArea className="flex-1">
-              <div className="p-6">
+              <div className="p-4">
                 <TabsContent value="template" className="mt-0">
                   <TemplateUploader
                     templateImage={backgroundImage}
@@ -200,84 +177,43 @@ export default function TemplateEditor() {
                   />
                 </TabsContent>
 
-                <TabsContent value="text" className="mt-0 space-y-5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-quirky-yellow flex items-center justify-center border-2 border-foreground">
-                      <Type className="w-4 h-4" />
-                    </div>
-                    <h3 className="text-sm font-bold">Name Text Settings</h3>
-                  </div>
-                  <TextCustomizer
-                    settings={nameSettings}
-                    onSettingsChange={setNameSettings}
-                    canvasWidth={canvasSize.width}
-                    canvasHeight={canvasSize.height}
-                    label="Name"
-                    colorAccent="bg-quirky-pink"
-                  />
-                </TabsContent>
-
-                <TabsContent value="extras" className="mt-0 space-y-8">
-                  <DateCustomizer
-                    settings={dateSettings}
-                    onSettingsChange={setDateSettings}
-                    canvasWidth={canvasSize.width}
-                    canvasHeight={canvasSize.height}
-                  />
-                  
-                  <div className="border-t border-border pt-8">
-                    <QRCustomizer
-                      settings={qrSettings}
-                      onSettingsChange={setQrSettings}
-                      canvasWidth={canvasSize.width}
-                      canvasHeight={canvasSize.height}
-                    />
-                  </div>
-                </TabsContent>
-
                 <TabsContent value="fields" className="mt-0">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-quirky-teal flex items-center justify-center border-2 border-foreground">
-                      <Plus className="w-4 h-4" />
-                    </div>
-                    <h3 className="text-sm font-bold">Template Fields</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Fields define what data each generated asset will contain.
-                  </p>
-                  <div className="space-y-2">
-                    {template.fields.map((field) => (
-                      <div key={field.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                        <div className="w-8 h-8 rounded bg-background flex items-center justify-center border">
-                          {field.type === 'text' && <Type className="w-4 h-4" />}
-                          {field.type === 'date' && <Calendar className="w-4 h-4" />}
-                          {field.type === 'qr' && <QrCode className="w-4 h-4" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium">{field.name}</p>
-                          <p className="text-xs text-muted-foreground capitalize">{field.type} {field.required && '• Required'}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <Button variant="outline" size="sm" className="w-full mt-4 gap-2" disabled>
-                    <Plus className="w-4 h-4" />
-                    Add Field (Coming Soon)
-                  </Button>
+                  <FieldsPanel
+                    fields={fields}
+                    selectedFieldId={selectedFieldId}
+                    canvasSize={canvasSize}
+                    onAddField={addField}
+                    onDeleteField={deleteField}
+                    onSelectField={setSelectedFieldId}
+                    onUpdateField={updateField}
+                  />
+                </TabsContent>
+
+                <TabsContent value="data" className="mt-0">
+                  <DataEntryPanel
+                    fields={fields}
+                    entries={entries}
+                    onEntriesChange={setEntries}
+                  />
+                </TabsContent>
+
+                <TabsContent value="preview" className="mt-0">
+                  <PreviewPanel template={{ ...template, backgroundImage, fields }} entries={entries} />
                 </TabsContent>
               </div>
             </ScrollArea>
           </Tabs>
         </aside>
 
-        {/* Center - Preview */}
+        {/* Center - Canvas Editor */}
         <main className="flex-1 bg-muted/30 flex flex-col overflow-hidden">
+          {/* Zoom controls */}
           <div className="flex items-center justify-center gap-2 p-3 border-b border-border bg-background/50">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setZoom(Math.max(25, zoom - 25))}
-              disabled={zoom <= 25}
+              onClick={() => setZoom(Math.max(10, zoom - 10))}
+              disabled={zoom <= 10}
             >
               <ZoomOut className="w-4 h-4" />
             </Button>
@@ -285,21 +221,25 @@ export default function TemplateEditor() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setZoom(Math.min(200, zoom + 25))}
-              disabled={zoom >= 200}
+              onClick={() => setZoom(Math.min(150, zoom + 10))}
+              disabled={zoom >= 150}
             >
               <ZoomIn className="w-4 h-4" />
             </Button>
           </div>
           
+          {/* Canvas area */}
           <div className="flex-1 overflow-auto flex items-center justify-center p-6">
-            <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'center' }}>
-              <CertificatePreview
-                config={config}
-                previewName="John Doe"
-                onCanvasLoad={handleCanvasLoad}
-              />
-            </div>
+            <CanvasEditor
+              backgroundImage={backgroundImage}
+              fields={fields}
+              selectedFieldId={selectedFieldId}
+              previewEntry={entries[0]}
+              scale={zoom / 100}
+              onSelectField={setSelectedFieldId}
+              onFieldPositionChange={updateFieldPosition}
+              onCanvasLoad={handleCanvasLoad}
+            />
           </div>
         </main>
       </div>
