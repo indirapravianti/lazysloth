@@ -206,9 +206,9 @@ export default function TemplateEditor() {
         </aside>
 
         {/* Center - Canvas Editor */}
-        <main className="flex-1 bg-muted/30 flex flex-col overflow-hidden">
+        <main className="flex-1 bg-muted/30 flex flex-col overflow-hidden min-h-0">
           {/* Zoom controls */}
-          <div className="flex items-center justify-center gap-2 p-3 border-b border-border bg-background/50">
+          <div className="flex items-center justify-center gap-2 p-3 border-b border-border bg-background/50 shrink-0">
             <Button
               variant="outline"
               size="sm"
@@ -228,18 +228,21 @@ export default function TemplateEditor() {
             </Button>
           </div>
           
-          {/* Canvas area */}
-          <div className="flex-1 overflow-auto flex items-center justify-center p-6">
-            <CanvasEditor
-              backgroundImage={backgroundImage}
-              fields={fields}
-              selectedFieldId={selectedFieldId}
-              previewEntry={entries[0]}
-              scale={zoom / 100}
-              onSelectField={setSelectedFieldId}
-              onFieldPositionChange={updateFieldPosition}
-              onCanvasLoad={handleCanvasLoad}
-            />
+          {/* Canvas area - fixed container with centered content */}
+          <div className="flex-1 flex items-center justify-center p-4 min-h-0 overflow-hidden">
+            <div className="relative w-full h-full flex items-center justify-center">
+              <CanvasEditor
+                backgroundImage={backgroundImage}
+                fields={fields}
+                selectedFieldId={selectedFieldId}
+                previewEntry={entries[0]}
+                scale={zoom / 100}
+                onSelectField={setSelectedFieldId}
+                onFieldPositionChange={updateFieldPosition}
+                onCanvasLoad={handleCanvasLoad}
+                fitToContainer
+              />
+            </div>
           </div>
         </main>
       </div>
