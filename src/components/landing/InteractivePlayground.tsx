@@ -1,35 +1,32 @@
-import { useState, useRef, useEffect } from 'react';
-import { Download, RefreshCw, Sparkles, Type } from 'lucide-react';
+import { useState, useRef, useEffect, ChangeEvent } from 'react';
+import { Download, RefreshCw, Sparkles, Type, ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import certificateTemplate from '@/assets/certificate.png';
+import idCardTemplate from '@/assets/id_card.png';
 
 const templates = [
   {
     id: 'certificate',
     name: 'Certificate',
-    bg: 'linear-gradient(135deg, hsl(48, 100%, 95%) 0%, hsl(48, 80%, 85%) 100%)',
-    border: 'hsl(48, 100%, 50%)',
+    image: certificateTemplate,
+    aspectRatio: 1.414, // A4 landscape-ish
   },
   {
-    id: 'badge',
-    name: 'Event Badge',
-    bg: 'linear-gradient(135deg, hsl(262, 80%, 95%) 0%, hsl(262, 60%, 85%) 100%)',
-    border: 'hsl(262, 83%, 58%)',
-  },
-  {
-    id: 'card',
-    name: 'Business Card',
-    bg: 'linear-gradient(135deg, hsl(168, 70%, 95%) 0%, hsl(168, 50%, 85%) 100%)',
-    border: 'hsl(168, 76%, 42%)',
+    id: 'id_card',
+    name: 'ID Card',
+    image: idCardTemplate,
+    aspectRatio: 0.63, // portrait card
   },
 ];
 
 export function InteractivePlayground() {
   const [selectedTemplate, setSelectedTemplate] = useState(templates[0]);
-  const [name, setName] = useState('Your Name Here');
-  const [title, setTitle] = useState('Achievement Award');
+  const [name, setName] = useState('Jane Doe');
+  const [userImage, setUserImage] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const drawCanvas = () => {
     const canvas = canvasRef.current;
@@ -38,115 +35,103 @@ export function InteractivePlayground() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      // Set canvas size based on template
+      const maxWidth = 500;
+      const scale = maxWidth / img.width;
+      canvas.width = maxWidth;
+      canvas.height = img.height * scale;
 
-    // Draw background gradient
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    if (selectedTemplate.id === 'certificate') {
-      gradient.addColorStop(0, '#fffef0');
-      gradient.addColorStop(1, '#fff4cc');
-    } else if (selectedTemplate.id === 'badge') {
-      gradient.addColorStop(0, '#f5f0ff');
-      gradient.addColorStop(1, '#e0d4f7');
-    } else {
-      gradient.addColorStop(0, '#f0fdfb');
-      gradient.addColorStop(1, '#ccf4ed');
-    }
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Draw template background
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-    // Draw decorative border
-    ctx.strokeStyle = selectedTemplate.border;
-    ctx.lineWidth = 8;
-    ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+      if (selectedTemplate.id === 'certificate') {
+        // Certificate: draw recipient name centered at the line area
+        ctx.fillStyle = '#1a365d';
+        ctx.font = 'bold 28px Georgia, serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(name || 'Jane Doe', canvas.width / 2, canvas.height * 0.52);
+      } else if (selectedTemplate.id === 'id_card') {
+        // ID Card: draw name at the line area (bottom portion)
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 20px Space Grotesk, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(name || 'Jane Doe', canvas.width / 2, canvas.height * 0.79);
 
-    // Inner border
-    ctx.lineWidth = 2;
-    ctx.strokeRect(35, 35, canvas.width - 70, canvas.height - 70);
+        // Draw user image inside the circle frame
+        if (userImage) {
+          const userImg = new Image();
+          userImg.crossOrigin = 'anonymous';
+          userImg.onload = () => {
+            // Circle position - centered, slightly above middle
+            const circleX = canvas.width / 2;
+            const circleY = canvas.height * 0.42;
+            const circleRadius = canvas.width * 0.185;
 
-    // Draw corner decorations
-    const corners = [
-      [50, 50],
-      [canvas.width - 50, 50],
-      [50, canvas.height - 50],
-      [canvas.width - 50, canvas.height - 50],
-    ];
-    
-    corners.forEach(([x, y]) => {
-      ctx.beginPath();
-      ctx.arc(x, y, 8, 0, Math.PI * 2);
-      ctx.fillStyle = selectedTemplate.border;
-      ctx.fill();
-    });
+            // Save context and create circular clip
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
 
-    // Draw title
-    ctx.fillStyle = '#1a1a1a';
-    ctx.font = 'bold 28px Space Grotesk, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(title.toUpperCase(), canvas.width / 2, 100);
+            // Draw the image centered in the circle
+            const size = circleRadius * 2;
+            ctx.drawImage(
+              userImg,
+              circleX - circleRadius,
+              circleY - circleRadius,
+              size,
+              size
+            );
 
-    // Draw decorative line
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 80, 130);
-    ctx.lineTo(canvas.width / 2 + 80, 130);
-    ctx.strokeStyle = selectedTemplate.border;
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // Draw "This is to certify that"
-    ctx.fillStyle = '#666';
-    ctx.font = '16px Space Grotesk, sans-serif';
-    ctx.fillText('This is presented to', canvas.width / 2, 170);
-
-    // Draw name
-    ctx.fillStyle = '#1a1a1a';
-    ctx.font = 'bold 36px Georgia, serif';
-    ctx.fillText(name || 'Your Name Here', canvas.width / 2, 220);
-
-    // Draw decorative underline for name
-    const nameWidth = ctx.measureText(name || 'Your Name Here').width;
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - nameWidth / 2 - 10, 245);
-    ctx.lineTo(canvas.width / 2 + nameWidth / 2 + 10, 245);
-    ctx.strokeStyle = selectedTemplate.border;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Draw description
-    ctx.fillStyle = '#666';
-    ctx.font = '14px Space Grotesk, sans-serif';
-    ctx.fillText('for outstanding achievement and dedication', canvas.width / 2, 280);
-
-    // Draw date
-    const today = new Date().toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-    ctx.fillStyle = '#888';
-    ctx.font = '12px Space Grotesk, sans-serif';
-    ctx.fillText(today, canvas.width / 2, 330);
-
-    // Draw LazySloth branding
-    ctx.fillStyle = selectedTemplate.border;
-    ctx.font = 'bold 10px Space Grotesk, sans-serif';
-    ctx.fillText('Generated with LazySloth', canvas.width / 2, canvas.height - 40);
+            ctx.restore();
+          };
+          userImg.src = userImage;
+        }
+      }
+    };
+    img.src = selectedTemplate.image;
   };
 
   useEffect(() => {
     drawCanvas();
-  }, [selectedTemplate, name, title]);
+  }, [selectedTemplate, name, userImage]);
+
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setUserImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const link = document.createElement('a');
-    link.download = `${name.replace(/\s+/g, '-').toLowerCase()}-certificate.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    // Need to redraw and wait for completion before download
+    setTimeout(() => {
+      const link = document.createElement('a');
+      link.download = `${name.replace(/\s+/g, '-').toLowerCase()}-${selectedTemplate.id}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }, 100);
+  };
+
+  const handleReset = () => {
+    setName('Jane Doe');
+    setUserImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -177,21 +162,29 @@ export function InteractivePlayground() {
             {/* Template selector */}
             <div className="bg-card border-2 border-foreground rounded-2xl p-6 shadow-quirky">
               <Label className="text-sm font-bold mb-3 block">Choose Template</Label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {templates.map((t) => (
                   <button
                     key={t.id}
-                    onClick={() => setSelectedTemplate(t)}
+                    onClick={() => {
+                      setSelectedTemplate(t);
+                      if (t.id === 'certificate') {
+                        setUserImage(null);
+                      }
+                    }}
                     className={`p-3 rounded-xl border-2 transition-all ${
                       selectedTemplate.id === t.id
                         ? 'border-foreground shadow-quirky-sm bg-muted'
                         : 'border-border hover:border-foreground'
                     }`}
                   >
-                    <div
-                      className="w-full h-12 rounded-lg mb-2 border"
-                      style={{ background: t.bg, borderColor: t.border }}
-                    />
+                    <div className="w-full h-16 rounded-lg mb-2 border overflow-hidden">
+                      <img 
+                        src={t.image} 
+                        alt={t.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <span className="text-xs font-medium">{t.name}</span>
                   </button>
                 ))}
@@ -202,22 +195,13 @@ export function InteractivePlayground() {
             <div className="bg-card border-2 border-foreground rounded-2xl p-6 shadow-quirky space-y-4">
               <div className="flex items-center gap-2 mb-2">
                 <Type className="w-4 h-4" />
-                <Label className="text-sm font-bold">Customize Text</Label>
+                <Label className="text-sm font-bold">Customize</Label>
               </div>
               
               <div>
-                <Label htmlFor="title" className="text-xs text-muted-foreground">Title</Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Certificate title..."
-                  className="mt-1"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="name" className="text-xs text-muted-foreground">Recipient Name</Label>
+                <Label htmlFor="name" className="text-xs text-muted-foreground">
+                  {selectedTemplate.id === 'certificate' ? 'Recipient Name' : "Person's Name"}
+                </Label>
                 <Input
                   id="name"
                   value={name}
@@ -226,16 +210,47 @@ export function InteractivePlayground() {
                   className="mt-1"
                 />
               </div>
+
+              {selectedTemplate.id === 'id_card' && (
+                <div>
+                  <Label htmlFor="photo" className="text-xs text-muted-foreground">Profile Photo</Label>
+                  <div className="mt-1">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      id="photo"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                      {userImage ? 'Change Photo' : 'Upload Photo'}
+                    </Button>
+                    {userImage && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <img 
+                          src={userImage} 
+                          alt="Preview" 
+                          className="w-10 h-10 rounded-full object-cover border-2 border-foreground"
+                        />
+                        <span className="text-xs text-muted-foreground">Photo uploaded</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Actions */}
             <div className="flex gap-3">
               <Button
                 variant="outline"
-                onClick={() => {
-                  setName('Your Name Here');
-                  setTitle('Achievement Award');
-                }}
+                onClick={handleReset}
                 className="flex-1 gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
@@ -253,8 +268,6 @@ export function InteractivePlayground() {
             <div className="bg-card border-2 border-foreground rounded-2xl p-4 shadow-quirky-lg">
               <canvas
                 ref={canvasRef}
-                width={500}
-                height={380}
                 className="w-full h-auto rounded-lg"
               />
             </div>
