@@ -95,8 +95,8 @@ export default {
 			'wiggle': 'wiggle 0.3s ease-in-out'
 		},
 		fontFamily: {
-			sans: ['Space Grotesk', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-			display: ['Space Grotesk', 'ui-sans-serif', 'system-ui', 'sans-serif']
+			sans: ['Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+			display: ['Manrope', 'ui-sans-serif', 'system-ui', 'sans-serif']
 		}
 	}
   },

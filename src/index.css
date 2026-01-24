@@ -1,33 +1,32 @@
-@import url("https://fonts.googleapis.com/css2?family=Mabry+Pro:wght@400;500;700;900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Quirky Gumroad-style design system */
+/* Gumroad-style design system - Black & Beige */
 
 @layer base {
   :root {
-    --background: 50 100% 98%;
-    --foreground: 0 0% 9%;
+    --background: 40 33% 96%;
+    --foreground: 0 0% 0%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card: 40 33% 98%;
+    --card-foreground: 0 0% 0%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover: 40 33% 98%;
+    --popover-foreground: 0 0% 0%;
 
     --primary: 48 100% 50%;
-    --primary-foreground: 0 0% 9%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 168 76% 42%;
+    --secondary: 340 82% 62%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 45 30% 90%;
+    --muted: 40 20% 90%;
     --muted-foreground: 0 0% 40%;
 
-    --accent: 45 100% 60%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 168 76% 42%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -38,10 +37,10 @@
 
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 9%;
+    --sidebar-background: 40 33% 98%;
+    --sidebar-foreground: 0 0% 0%;
     --sidebar-primary: 48 100% 50%;
-    --sidebar-primary-foreground: 0 0% 9%;
+    --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 168 76% 42%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 0%;
@@ -49,18 +48,18 @@
 
     --chart-1: 48 100% 50%;
     --chart-2: 168 76% 42%;
-    --chart-3: 45 100% 60%;
+    --chart-3: 340 82% 62%;
     --chart-4: 262 83% 58%;
     --chart-5: 199 89% 48%;
 
     --quirky-pink: 340 82% 62%;
     --quirky-teal: 168 76% 42%;
-    --quirky-yellow: 45 100% 60%;
+    --quirky-yellow: 48 100% 50%;
     --quirky-purple: 262 83% 58%;
     --quirky-blue: 199 89% 48%;
 
-    --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Manrope', ui-sans-serif, system-ui, sans-serif;
 
     --shadow-quirky: 4px 4px 0px 0px hsl(0 0% 0%);
     --shadow-quirky-sm: 2px 2px 0px 0px hsl(0 0% 0%);
@@ -69,59 +68,59 @@
   }
 
   .dark {
-    --background: 0 0% 9%;
-    --foreground: 50 100% 98%;
+    --background: 0 0% 6%;
+    --foreground: 40 33% 96%;
 
-    --card: 0 0% 14%;
-    --card-foreground: 50 100% 98%;
+    --card: 0 0% 10%;
+    --card-foreground: 40 33% 96%;
 
-    --popover: 0 0% 14%;
-    --popover-foreground: 50 100% 98%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 40 33% 96%;
 
     --primary: 48 100% 55%;
-    --primary-foreground: 0 0% 9%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 168 76% 52%;
+    --secondary: 340 82% 62%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 0 0% 20%;
-    --muted-foreground: 0 0% 70%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 45 100% 60%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 168 76% 52%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 100%;
-    --input: 0 0% 100%;
+    --border: 40 33% 96%;
+    --input: 40 33% 96%;
     --ring: 48 100% 55%;
 
-    --sidebar-background: 0 0% 12%;
-    --sidebar-foreground: 50 100% 98%;
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 40 33% 96%;
     --sidebar-primary: 48 100% 55%;
-    --sidebar-primary-foreground: 0 0% 9%;
+    --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 168 76% 52%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 100%;
+    --sidebar-border: 40 33% 96%;
     --sidebar-ring: 48 100% 55%;
 
     --chart-1: 48 100% 55%;
     --chart-2: 168 76% 52%;
-    --chart-3: 45 100% 60%;
+    --chart-3: 340 82% 72%;
     --chart-4: 262 83% 68%;
     --chart-5: 199 89% 58%;
 
     --quirky-pink: 340 82% 62%;
     --quirky-teal: 168 76% 52%;
-    --quirky-yellow: 45 100% 60%;
+    --quirky-yellow: 48 100% 55%;
     --quirky-purple: 262 83% 68%;
     --quirky-blue: 199 89% 58%;
 
-    --shadow-quirky: 4px 4px 0px 0px hsl(0 0% 100% / 0.3);
-    --shadow-quirky-sm: 2px 2px 0px 0px hsl(0 0% 100% / 0.3);
-    --shadow-quirky-lg: 6px 6px 0px 0px hsl(0 0% 100% / 0.3);
-    --shadow-quirky-hover: 2px 2px 0px 0px hsl(0 0% 100% / 0.3);
+    --shadow-quirky: 4px 4px 0px 0px hsl(40 33% 96% / 0.2);
+    --shadow-quirky-sm: 2px 2px 0px 0px hsl(40 33% 96% / 0.2);
+    --shadow-quirky-lg: 6px 6px 0px 0px hsl(40 33% 96% / 0.2);
+    --shadow-quirky-hover: 2px 2px 0px 0px hsl(40 33% 96% / 0.2);
   }
 }
 

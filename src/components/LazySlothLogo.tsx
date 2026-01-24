@@ -4,9 +4,10 @@ interface LazySlothLogoProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showText?: boolean;
+  inverted?: boolean;
 }
 
-export function LazySlothLogo({ className, size = 'md', showText = true }: LazySlothLogoProps) {
+export function LazySlothLogo({ className, size = 'md', showText = true, inverted = false }: LazySlothLogoProps) {
   const sizes = {
     sm: { icon: 'w-8 h-8', text: 'text-lg', subtext: 'text-[10px]' },
     md: { icon: 'w-10 h-10', text: 'text-xl', subtext: 'text-xs' },
@@ -17,7 +18,8 @@ export function LazySlothLogo({ className, size = 'md', showText = true }: LazyS
   return (
     <div className={cn('flex items-center gap-3', className)}>
       <div className={cn(
-        'relative rounded-2xl bg-primary flex items-center justify-center border-2 border-foreground shadow-quirky-sm',
+        'relative rounded-2xl bg-primary flex items-center justify-center border-2',
+        inverted ? 'border-background' : 'border-foreground',
         sizes[size].icon
       )}>
         {/* Sloth Face */}
@@ -52,8 +54,15 @@ export function LazySlothLogo({ className, size = 'md', showText = true }: LazyS
       
       {showText && (
         <div>
-          <h1 className={cn('font-bold tracking-tight', sizes[size].text)}>LazySloth</h1>
-          <p className={cn('text-muted-foreground', sizes[size].subtext)}>Generate at scale</p>
+          <h1 className={cn(
+            'font-bold tracking-tight',
+            sizes[size].text,
+            inverted ? 'text-background' : 'text-foreground'
+          )}>LazySloth</h1>
+          <p className={cn(
+            sizes[size].subtext,
+            inverted ? 'text-background/70' : 'text-muted-foreground'
+          )}>Generate at scale</p>
         </div>
       )}
     </div>

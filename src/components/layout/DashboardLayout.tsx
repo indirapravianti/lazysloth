@@ -20,12 +20,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="border-b-2 border-foreground bg-card shrink-0">
+      {/* Header - Black navbar */}
+      <header className="bg-foreground text-background shrink-0">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <Link to="/">
-              <LazySlothLogo size="sm" />
+              <LazySlothLogo size="sm" inverted />
             </Link>
             
             {/* Desktop Nav */}
@@ -41,7 +41,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                       isActive
                         ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                        : 'text-background/70 hover:text-background hover:bg-background/10'
                     )}
                   >
                     <item.icon className="w-4 h-4" />
@@ -66,7 +66,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors',
                   isActive
                     ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    : 'text-background/70 hover:text-background hover:bg-background/10'
                 )}
               >
                 <item.icon className="w-4 h-4" />
